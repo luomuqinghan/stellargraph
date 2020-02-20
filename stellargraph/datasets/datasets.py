@@ -219,11 +219,10 @@ def _load_tsv_knowledge_graph(dataset):
     node_ids = pd.unique(pd.concat([all_data.source, all_data.target]))
     nodes = pd.DataFrame(index=node_ids)
 
-    edges = {
-        name: df.drop(columns="label") for name, df in all_data.groupby("label")
-    }
+    edges = {name: df.drop(columns="label") for name, df in all_data.groupby("label")}
 
     return StellarDiGraph(nodes=nodes, edges=edges), SplitData(train, test, valid)
+
 
 class WN18(
     DatasetLoader,
@@ -248,23 +247,22 @@ class WN18(
 
 
 class FB15k(
-        DatasetLoader,
-        name="FB15k",
-        directory_name="FB15k",
-        url="https://ndownloader.figshare.com/files/21768729",
-        url_archive_format="zip",
-        expected_files=[
-            "freebase_mtr100_mte100-train.txt",
-            "freebase_mtr100_mte100-test.txt",
-            "freebase_mtr100_mte100-valid.txt",
-        ],
-        description="This FREEBASE FB15k DATA consists of a collection of triplets (synset, relation_type, triplet)"
-        "extracted from Freebase (http://www.freebase.com). There are 14,951 mids and 1,345 relation types among them. "
-        "The training set contains 483,142 triplets, the validation set 50,000 and the test set 59,071. "
-        "Translating Embeddings for Modeling Multi-relational Data. Antoine Bordes, Nicolas Usunier, Alberto Garcia-Durán, "
-        "Jason Weston and Oksana Yakhnenko",
-        source="https://everest.hds.utc.fr/doku.php?id=en:transe"
+    DatasetLoader,
+    name="FB15k",
+    directory_name="FB15k",
+    url="https://ndownloader.figshare.com/files/21768729",
+    url_archive_format="zip",
+    expected_files=[
+        "freebase_mtr100_mte100-train.txt",
+        "freebase_mtr100_mte100-test.txt",
+        "freebase_mtr100_mte100-valid.txt",
+    ],
+    description="This FREEBASE FB15k DATA consists of a collection of triplets (synset, relation_type, triplet)"
+    "extracted from Freebase (http://www.freebase.com). There are 14,951 mids and 1,345 relation types among them. "
+    "The training set contains 483,142 triplets, the validation set 50,000 and the test set 59,071. "
+    "Translating Embeddings for Modeling Multi-relational Data. Antoine Bordes, Nicolas Usunier, Alberto Garcia-Durán, "
+    "Jason Weston and Oksana Yakhnenko",
+    source="https://everest.hds.utc.fr/doku.php?id=en:transe",
 ):
     def load(self):
         return _load_tsv_knowledge_graph(self)
-

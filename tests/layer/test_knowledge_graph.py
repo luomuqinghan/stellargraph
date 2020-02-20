@@ -116,18 +116,23 @@ def test_complex_rankings():
     x_inp, x_out = ComplEx(gen, 5).build()
     model = Model(x_inp, x_out)
 
-    raw_no, filtered_no = ComplEx.rank_edges_against_all_nodes(model, gen.flow(df), no_edges)
+    raw_no, filtered_no = ComplEx.rank_edges_against_all_nodes(
+        model, gen.flow(df), no_edges
+    )
     np.testing.assert_array_equal(raw_no, filtered_no)
 
-    raw_some, filtered_some = ComplEx.rank_edges_against_all_nodes(model, gen.flow(df), some_edges)
+    raw_some, filtered_some = ComplEx.rank_edges_against_all_nodes(
+        model, gen.flow(df), some_edges
+    )
     # the filtered ranks are always less than the raw ones, and there should be some ranks that are
     # less.
     assert np.all(filtered_some <= raw_some)
     assert np.any(filtered_some < raw_some)
     np.testing.assert_array_equal(raw_some, raw_no)
 
-    raw_all, filtered_all = ComplEx.rank_edges_against_all_nodes(model, gen.flow(df), all_edges)
+    raw_all, filtered_all = ComplEx.rank_edges_against_all_nodes(
+        model, gen.flow(df), all_edges
+    )
     # every edge is known, so every edge gets filtered out, leaving everything as rank 1
     assert np.all(filtered_all == 1)
     np.testing.assert_array_equal(raw_all, raw_no)
-

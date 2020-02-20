@@ -179,7 +179,9 @@ class ComplEx:
         """
 
         if not isinstance(test_data, KGTripleSequence):
-            raise TypeError("test_data: expected KGTripleSequence; found {type(test_data).__name__}")
+            raise TypeError(
+                "test_data: expected KGTripleSequence; found {type(test_data).__name__}"
+            )
 
         def ranks(pred, true_ilocs, true_is_source):
             # the score of the true edge, for each edge in the batch (num_nodes x batch_size ->
@@ -218,7 +220,7 @@ class ComplEx:
 
         num_tested = 0
         for i in range(len(test_data)):
-            (subjects, rels, objects),  = test_data[i]
+            ((subjects, rels, objects),) = test_data[i]
             num_tested += len(subjects)
 
             # batch_size x k
@@ -231,8 +233,12 @@ class ComplEx:
             mod_s_pred = np.inner(n, rs * os.conj()).real
 
             # shape of each: batch_size
-            mod_o_raw, mod_o_filt = ranks(mod_o_pred, true_ilocs=objects, true_is_source=True)
-            mod_s_raw, mod_s_filt = ranks(mod_s_pred, true_ilocs=subjects, true_is_source=False)
+            mod_o_raw, mod_o_filt = ranks(
+                mod_o_pred, true_ilocs=objects, true_is_source=True
+            )
+            mod_s_raw, mod_s_filt = ranks(
+                mod_s_pred, true_ilocs=subjects, true_is_source=False
+            )
 
             raws.append(np.column_stack((mod_o_raw, mod_s_raw)))
             filtereds.append(np.column_stack((mod_o_filt, mod_s_filt)))
@@ -244,7 +250,6 @@ class ComplEx:
         assert raw.shape == filtered.shape == (num_tested, 2)
 
         return raw, filtered
-
 
     def _embed(self, count, name):
         return Embedding(
