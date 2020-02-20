@@ -23,6 +23,7 @@ import numpy as np
 
 from tensorflow.keras import Model, initializers, losses
 
+from stellargraph import StellarGraph
 from stellargraph.mapper.knowledge_graph import KGTripleGenerator
 from stellargraph.layer.knowledge_graph import ComplEx
 
@@ -85,3 +86,50 @@ def test_complex(knowledge_graph):
 
     # (use an absolute tolerance to allow for catastrophic cancellation around very small values)
     assert np.allclose(prediction[:, 0], actual, rtol=1e-3, atol=1e-14)
+
+
+def test_complex_rankings():
+    nodes = ["a", "b", "c", "d"]
+    rels = ["W", "X", "Y", "Z"]
+    empty = pd.DataFrame(columns=["source", "target"])
+
+    every_edge = itertools.product(nodes, rels, nodes)
+    df = triple_df(*every_edge)
+
+    def make_graph(raw_edges):
+        edges = {}
+        groups = raw_edges.groupby("label")
+        for name in rels:
+            try:
+                this_rel = groups.get_group(name).drop(columns="label")
+            except KeyError:
+                this_rel = empty
+            edges[name] = this_rel
+
+        import pdb; pdb.set_trace()
+        return StellarGraph(nodes=pd.DataFrame(index=nodes), edges=edges)
+
+    no_edges = make_graph(df[:0])
+    some_edges = make_graph(df[:10])
+    all_edges = make_graph(df)
+
+    gen = KGTripleGenerator(no_edges, 3)
+    x_inp, x_out = ComplEx(gen, 5).build()
+    model = Model(x_inp, x_out)
+
+    raw_no, filtered_no = ComplEx.rank_edges_against_all_nodes(model, gen.flow(df), no_edges)
+    np.testing.assert_array_equal(raw_no, filtered_no)
+
+    raw_some, filtered_some = ComplEx.rank_edges_against_all_nodes(model, gen.flow(df), some_edges)
+    # the filtered ranks are always less than the raw ones, and there should be some ranks that are
+    # less.
+    assert np.all(filtered_some <= raw_some)
+    assert np.any(filtered_some < raw_some)
+    np.testing.assert_array_equal(raw_some, raw_no)
+
+    import pdb; pdb.set_trace()
+    raw_all, filtered_all = ComplEx.rank_edges_against_all_nodes(model, gen.flow(df), all_edges)
+    # every edge is known, so every edge gets filtered out, leaving everything as rank 1
+    assert np.all(filtered_all == 1)
+    np.testing.assert_array_equal(raw_all, raw_no)
+
