@@ -106,7 +106,6 @@ def test_complex_rankings():
                 this_rel = empty
             edges[name] = this_rel
 
-        import pdb; pdb.set_trace()
         return StellarGraph(nodes=pd.DataFrame(index=nodes), edges=edges)
 
     no_edges = make_graph(df[:0])
@@ -127,7 +126,6 @@ def test_complex_rankings():
     assert np.any(filtered_some < raw_some)
     np.testing.assert_array_equal(raw_some, raw_no)
 
-    import pdb; pdb.set_trace()
     raw_all, filtered_all = ComplEx.rank_edges_against_all_nodes(model, gen.flow(df), all_edges)
     # every edge is known, so every edge gets filtered out, leaving everything as rank 1
     assert np.all(filtered_all == 1)
