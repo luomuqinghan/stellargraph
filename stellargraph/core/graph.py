@@ -972,11 +972,11 @@ class StellarGraph:
 
         n = len(index)
 
-        adj = sps.csr_matrix((weights, (src_idx, tgt_idx)), shape=(n, n))
+        adj = sps.coo_matrix((weights, (src_idx, tgt_idx)), shape=(n, n))
         if not self.is_directed():
             # in an undirected graph, the adjacency matrix should be symmetric: which means counting
             # weights from either "incoming" or "outgoing" edges, but not double-counting self loops
-            backward = sps.csr_matrix((weights, (tgt_idx, src_idx)), shape=(n, n))
+            backward = sps.coo_matrix((weights, (tgt_idx, src_idx)), shape=(n, n))
             backward.setdiag(0)
             adj += backward
 
